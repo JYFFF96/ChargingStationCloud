@@ -1,13 +1,30 @@
 <view class="charging-page">
   <view class="charge-hero">
     <view class="soc-ring"><text class="soc">{{soc}}</text><text class="pct">%</text></view>
-    <view class="charge-state">{{charging?'正在充电':'等待启动'}}</view>
+    <view class="charge-state">{{statusText}}</view>
+    <view class="pile-code" wx:if="{{pileCode}}">桩编号 {{pileCode}}</view>
   </view>
+
+  <view wx:if="{{error}}" class="tip">{{error}}</view>
+
   <view class="grid">
-    <view><text>{{voltage}}</text><span>电压 V</span></view><view><text>{{current}}</text><span>电流 A</span></view><view><text>{{power}}</text><span>功率 kW</span></view>
-    <view><text>{{energy}}</text><span>电量 kWh</span></view><view><text>{{minutes}}</text><span>时长 min</span></view><view><text>{{amount}}</text><span>金额 元</span></view>
+    <view><text>{{voltage}}</text><span>电压 V</span></view>
+    <view><text>{{current}}</text><span>电流 A</span></view>
+    <view><text>{{power}}</text><span>功率 kW</span></view>
+    <view><text>{{energy}}</text><span>电量 kWh</span></view>
+    <view><text>{{minutes}}</text><span>已充 min</span></view>
+    <view><text>{{remaining}}</text><span>剩余 min</span></view>
+    <view><text>{{temp}}</text><span>枪温 ℃</span></view>
+    <view><text>{{amount}}</text><span>金额 元</span></view>
+    <view><text>{{faultText}}</text><span>硬件故障</span></view>
   </view>
-  <view class="billing"><view><span>当前计费</span><b>峰段</b></view><view><span>电费</span><b>4.00000 元/kWh</b></view><view><span>服务费</span><b>0.40000 元/kWh</b></view></view>
+
+  <view class="billing">
+    <view><span>当前计费</span><b>峰段</b></view>
+    <view><span>电费</span><b>4.00000 元/kWh</b></view>
+    <view><span>服务费</span><b>0.40000 元/kWh</b></view>
+  </view>
+
   <button class="action {{charging?'stop':'start'}}" bindtap="toggle">{{charging?'停止充电':'启动充电'}}</button>
-  <view class="tip">当前实时参数为原型占位数据；下一版接入云快充 0x13 后改为真实数据。</view>
+  <view class="tip">实时参数来自云快充 V1.6 的 0x13 上传实时监测数据；当前按钮暂未下发 0x34/0x36。</view>
 </view>
