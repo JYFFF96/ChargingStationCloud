@@ -1,64 +1,14 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>智学客交直流一体化实训教学云平台</title>
-  <link rel="stylesheet" href="/web/style.css" />
-</head>
-<body>
-  <div class="layout">
-    <aside class="sidebar">
-      <div class="brand"><div class="brand-title">智学客</div><div class="brand-sub">交直流一体化实训教学云平台</div></div>
-      <div class="section">环境配置</div>
-      <button class="nav active" data-page="dashboard">◉ 调试环境信息</button>
-      <button class="nav" data-page="devices">⚡ 充电桩管理</button>
-      <div class="section">沙箱测试 · 厂家自测</div>
-      <button class="nav" data-page="realtime">▣ 实时数据监控</button>
-      <button class="nav" data-page="remote">▶ 远程启动充电</button>
-      <button class="nav" data-page="fault">⚠ 故障码上送</button>
-      <button class="nav" data-page="qrcode">⌁ 二维码下发</button>
-      <button class="nav" data-page="logs">▤ 日志查询</button>
-      <div class="section">教学参考</div>
-      <button class="nav" data-page="billing">¥ 计费模型</button>
-      <button class="nav" data-page="teaching">▦ 教学说明</button>
-      <div class="sidebar-foot">协议：云快充 V1.6<br>TCP：8768</div>
-    </aside>
-
-    <main class="main">
-      <header class="topbar"><div><h1 id="pageTitle">调试环境信息</h1><p>ChargingStationCloud · V0.3</p></div><div class="top-actions"><span id="clock"></span><button id="teachBtn" class="teach">教学模式：关</button></div></header>
-      <section class="content">
-        <div id="dashboard" class="page active">
-          <div class="hero"><div><h2>云快充实训环境</h2><p>充电桩通过 TCP/IP Socket 长连接接入，平台统一提供设备状态、协议调试、充电控制与教学展示。</p></div><div class="hero-badge">SERVER ONLINE</div></div>
-          <div class="stat-grid"><div class="stat"><span>在线设备</span><strong id="statOnline">0</strong></div><div class="stat"><span>设备总数</span><strong id="statTotal">0</strong></div><div class="stat"><span>充电中</span><strong id="statCharging">0</strong></div><div class="stat"><span>故障</span><strong id="statFault">0</strong></div></div>
-          <div class="card"><div class="card-title">调试环境信息</div><div class="info-grid"><div><span>测试服务器地址</span><b>当前本机 / 局域网 IP</b></div><div><span>通信端口</span><b>8768</b></div><div><span>通信方式</span><b>TCP/IP Socket 长连接</b></div><div><span>HTTP API</span><b>8000</b></div><div><span>协议版本</span><b>云快充 V1.6</b></div><div><span>心跳周期</span><b>10 秒</b></div></div></div>
-        </div>
-
-        <div id="devices" class="page">
-          <div class="card"><div class="card-head"><div class="card-title">充电桩列表</div><button class="primary" onclick="loadDevices()">刷新</button></div><div class="table-wrap"><table><thead><tr><th>桩编号</th><th>桩类型</th><th>枪数量</th><th>协议版本</th><th>程序版本</th><th>网络类型</th><th>状态</th><th>最后报文</th></tr></thead><tbody id="deviceRows"></tbody></table></div></div>
-          <div class="card"><div class="card-title">登录认证报文（0x01）</div><div class="protocol"><span>68</span> <span>LEN</span> <span>SEQ</span> <span>00</span> <b>01</b> <em>PILE_CODE ...</em> <span>CRC16</span></div></div>
-        </div>
-
-        <div id="realtime" class="page">
-          <div class="card"><div class="card-head"><div class="card-title">实时数据监控 · 0x13</div><select id="rtPile" onchange="loadRealtime()"></select></div>
-            <div class="metric-grid">
-              <div><span>输出电压</span><b id="rtVoltage">-- V</b></div><div><span>输出电流</span><b id="rtCurrent">-- A</b></div><div><span>充电功率</span><b id="rtPower">-- kW</b></div>
-              <div><span>SOC</span><b id="rtSoc">-- %</b></div><div><span>累计电量</span><b id="rtEnergy">-- kWh</b></div><div><span>累计时间</span><b id="rtElapsed">-- min</b></div>
-              <div><span>剩余时间</span><b id="rtRemain">-- min</b></div><div><span>枪线温度</span><b id="rtTemp">-- ℃</b></div><div><span>已充金额</span><b id="rtAmount">-- 元</b></div>
-            </div>
-          </div>
-          <div class="card"><div class="card-title">0x13 状态</div><div class="info-grid"><div><span>枪号</span><b id="rtGun">--</b></div><div><span>工作状态</span><b id="rtStatus">--</b></div><div><span>是否插枪</span><b id="rtPlugged">--</b></div><div><span>硬件故障</span><b id="rtFaults">--</b></div><div><span>交易流水号</span><b id="rtTx">--</b></div><div><span>数据更新时间</span><b id="rtUpdated">--</b></div></div></div>
-        </div>
-
-        <div id="remote" class="page"><div class="card"><div class="card-title">远程启动充电 · 0x34</div><div class="form-grid"><label>充电桩<select id="remotePile"></select></label><label>枪号<select><option>01</option></select></label><label>账户余额<input value="1000.00" /></label><label>逻辑卡号<input value="0000000000000000" /></label></div><button class="success">下发远程启机命令</button><p class="hint">支付/余额/计费字段按当前需求继续保留。</p></div></div>
-        <div id="fault" class="page"><div class="card"><div class="card-title">故障码上送</div><div class="fault-grid"><span>急停按钮动作</span><span>整流模块故障</span><span>出风口温度过高</span><span>防雷故障</span><span>通信中断</span><span>门打开</span></div></div></div>
-        <div id="qrcode" class="page"><div class="card"><div class="card-title">二维码下发</div><p>选择设备与枪号后生成扫码充电二维码。扫码后进入小程序并触发远程启机流程。</p><div class="qr-placeholder">QR</div></div></div>
-        <div id="logs" class="page"><div class="card"><div class="card-title">通信日志</div><div class="log">[INFO] 0x13 实时数据已接入；完整 TCP 报文日志 API 后续继续补充。</div></div></div>
-        <div id="billing" class="page"><div class="card"><div class="card-title">计费模型</div><div class="billing-grid"><div><span>尖</span><b>5.00000 元/kWh</b></div><div><span>峰</span><b>4.00000 元/kWh</b></div><div><span>平</span><b>3.00000 元/kWh</b></div><div><span>谷</span><b>2.00000 元/kWh</b></div></div></div></div>
-        <div id="teaching" class="page"><div class="card"><div class="card-title">教学说明</div><div class="teach-box"><b>上电流程</b><p>0x01 登录 → 0x02 应答 → 0x03 心跳 → 0x04 应答 → 计费模型验证。</p></div><div class="teach-box"><b>实时监测</b><p>0x13 由桩周期上送；待机 5 分钟，充电中 15 秒，同时支持变位上送和平台召唤。</p></div></div></div>
-      </section>
-    </main>
-  </div>
-  <script src="/web/app.js"></script>
-</body>
-</html>
+<html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>智学客交直流一体化实训教学云平台</title><link rel="stylesheet" href="/web/style.css"></head>
+<body><div class="layout"><aside class="sidebar"><div class="brand"><div class="brand-title">智学客</div><div class="brand-sub">交直流一体化实训教学云平台</div></div><div class="section">环境配置</div><button class="nav active" data-page="dashboard">◉ 调试环境信息</button><button class="nav" data-page="devices">⚡ 充电桩管理</button><div class="section">沙箱测试 · 厂家自测</div><button class="nav" data-page="realtime">▣ 实时数据监控</button><button class="nav" data-page="remote">▶ 远程启停充电</button><button class="nav" data-page="fault">⚠ 故障码上送</button><button class="nav" data-page="qrcode">⌁ 二维码下发</button><button class="nav" data-page="logs">▤ 日志查询</button><div class="section">教学参考</div><button class="nav" data-page="billing">¥ 计费模型</button><button class="nav" data-page="teaching">▦ 教学说明</button><div class="sidebar-foot">协议：云快充 V1.6<br>TCP：8768</div></aside>
+<main class="main"><header class="topbar"><div><h1 id="pageTitle">调试环境信息</h1><p>ChargingStationCloud · V1.0-RC1</p></div><div class="top-actions"><span id="clock"></span><button id="teachBtn" class="teach">教学模式：关</button></div></header><section class="content">
+<div id="dashboard" class="page active"><div class="hero"><div><h2>云快充实训环境</h2><p>TCP/IP Socket 长连接接入，平台统一提供设备状态、协议调试、充电控制、交易记录与教学展示。</p></div><div class="hero-badge">RC1 ONLINE</div></div><div class="stat-grid"><div class="stat"><span>在线设备</span><strong id="statOnline">0</strong></div><div class="stat"><span>设备总数</span><strong id="statTotal">0</strong></div><div class="stat"><span>充电中</span><strong id="statCharging">0</strong></div><div class="stat"><span>故障</span><strong id="statFault">0</strong></div></div><div class="card"><div class="card-title">调试环境信息</div><div class="info-grid"><div><span>测试服务器地址</span><b>当前本机 / 局域网 IP</b></div><div><span>通信端口</span><b>8768</b></div><div><span>HTTP API</span><b>8000</b></div><div><span>协议版本</span><b>云快充 V1.6</b></div><div><span>心跳周期</span><b>10 秒</b></div><div><span>候选版本</span><b>V1.0-RC1</b></div></div></div></div>
+<div id="devices" class="page"><div class="card"><div class="card-head"><div class="card-title">充电桩列表</div><button class="primary" onclick="loadDevices()">刷新</button></div><div class="table-wrap"><table><thead><tr><th>桩编号</th><th>桩类型</th><th>枪数量</th><th>协议版本</th><th>程序版本</th><th>网络类型</th><th>状态</th><th>充电状态</th><th>最后报文</th></tr></thead><tbody id="deviceRows"></tbody></table></div></div></div>
+<div id="realtime" class="page"><div class="card"><div class="card-head"><div class="card-title">实时数据监控 · 0x13</div><select id="rtPile" onchange="loadRealtime()"></select></div><div class="metric-grid"><div><span>输出电压</span><b id="rtVoltage">-- V</b></div><div><span>输出电流</span><b id="rtCurrent">-- A</b></div><div><span>充电功率</span><b id="rtPower">-- kW</b></div><div><span>SOC</span><b id="rtSoc">-- %</b></div><div><span>累计电量</span><b id="rtEnergy">-- kWh</b></div><div><span>累计时间</span><b id="rtElapsed">-- min</b></div><div><span>剩余时间</span><b id="rtRemain">-- min</b></div><div><span>枪线温度</span><b id="rtTemp">-- ℃</b></div><div><span>已充金额</span><b id="rtAmount">-- 元</b></div></div></div><div class="card"><div class="card-title">0x13 状态</div><div class="info-grid"><div><span>枪号</span><b id="rtGun">--</b></div><div><span>工作状态</span><b id="rtStatus">--</b></div><div><span>是否插枪</span><b id="rtPlugged">--</b></div><div><span>硬件故障</span><b id="rtFaults">--</b></div><div><span>交易流水号</span><b id="rtTx">--</b></div><div><span>更新时间</span><b id="rtUpdated">--</b></div></div></div></div>
+<div id="remote" class="page"><div class="card"><div class="card-title">远程启停充电 · 0x34 / 0x36</div><div class="form-grid"><label>充电桩<select id="remotePile"></select></label><label>枪号<select id="remoteGun"><option value="01">01</option><option value="02">02</option></select></label><label>账户余额<input id="remoteBalance" value="1000.00"></label><label>逻辑卡号<input id="remoteCard" value="0000000000000000"></label></div><div class="top-actions"><button class="success" onclick="startCharge()">下发远程启机 0x34</button><button class="primary" onclick="stopCharge()">下发远程停机 0x36</button></div><p class="hint" id="controlResult">等待操作</p></div><div class="card"><div class="card-head"><div class="card-title">充电交易</div><button class="primary" onclick="loadTransactions()">刷新</button></div><div class="table-wrap"><table><thead><tr><th>交易流水号</th><th>桩编号</th><th>枪号</th><th>状态</th><th>SOC</th><th>电量</th><th>金额</th></tr></thead><tbody id="transactionRows"></tbody></table></div></div></div>
+<div id="fault" class="page"><div class="card"><div class="card-title">故障码上送 · 0x13 Bit1~Bit13</div><div class="fault-grid"><span>急停按钮动作</span><span>整流模块故障</span><span>出风口温度过高</span><span>防雷故障</span><span>通信中断</span><span>门打开</span></div><p class="hint">当前故障状态来自0x13实时监测字段。</p></div></div>
+<div id="qrcode" class="page"><div class="card"><div class="card-title">二维码下发</div><p>二维码内容建议采用 zxkcharge://pile/桩编号/枪号；小程序扫码解析后调用远程启机接口。</p><div class="form-grid"><label>桩编号<input id="qrPile" value="32010200000001"></label><label>枪号<input id="qrGun" value="01"></label></div><button class="primary" onclick="makeQrText()">生成二维码内容</button><div class="protocol" id="qrText">zxkcharge://pile/32010200000001/01</div></div></div>
+<div id="logs" class="page"><div class="card"><div class="card-head"><div class="card-title">通信日志</div><button class="primary" onclick="loadLogs()">刷新</button></div><div id="logList" class="log">等待日志...</div></div><div class="card"><div class="card-title">报文校验</div><textarea id="verifyHex" class="form-control" style="width:100%;height:100px" placeholder="粘贴HEX报文"></textarea><button class="primary" onclick="verifyFrame()">校验</button><pre id="verifyResult" class="protocol">等待输入</pre></div></div>
+<div id="billing" class="page"><div class="card"><div class="card-title">计费模型</div><div class="billing-grid"><div><span>尖</span><b id="rateSharp">--</b></div><div><span>峰</span><b id="ratePeak">--</b></div><div><span>平</span><b id="rateFlat">--</b></div><div><span>谷</span><b id="rateValley">--</b></div></div><p class="hint" id="serviceFee">服务费 --</p></div></div>
+<div id="teaching" class="page"><div class="card"><div class="card-title">教学说明</div><div class="teach-box"><b>上电流程</b><p>0x01 登录 → 0x02 应答 → 0x03 心跳 → 0x04 应答 → 0x05/0x06 计费模型验证。</p></div><div class="teach-box"><b>远程充电</b><p>0x34 → 0x33 → 0x13 → 0x36 → 0x35 → 0x3B → 0x40。</p></div><div class="teach-box"><b>桩端充电</b><p>0x31 → 0x32 → 0x13 → 0x3B → 0x40。RC1模拟器可通过 --pile-start 测试。</p></div></div></div>
+</section></main></div><script src="/web/app.js"></script></body></html>
