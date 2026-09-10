@@ -52,11 +52,12 @@ class DeviceRegistry:
     def update_realtime(self, info: dict) -> Optional[DeviceState]:
         dev=self._devices.get(info['pile_code'])
         if not dev: return None
-        dev.realtime=dict(info); dev.realtime['updated_at']=time.time(); dev.transaction_id=info.get('transaction_id') or dev.transaction_id
+        dev.realtime=dict(info); dev.realtime['updated_at']=time.time()
+        txid=info.get('transaction_id','')
+        if txid and txid.strip('0'): dev.transaction_id=txid
         if info.get('work_status') == 3: dev.charge_state='charging'
-        elif info.get('work_status') in (0,1,2): dev.charge_state='idle'
+        elif info.get('work_status') in (0,1,2) and dev.charge_state not in ('starting','stopping'): dev.charge_state='idle'
         dev.touch(0x13)
-        txid=info.get('transaction_id')
         if txid and txid.strip('0'):
             tx=self._transactions.setdefault(txid, {'transaction_id':txid,'pile_code':dev.pile_code,'gun_no':info.get('gun_no','01'),'status':'charging','started_at':time.time()})
             tx.update({'status':'charging' if info.get('work_status')==3 else tx.get('status','idle'),'soc_pct':info.get('soc_pct'),'energy_kwh':info.get('energy_kwh'),'amount_yuan':info.get('amount_yuan'),'updated_at':time.time()})
@@ -66,6 +67,8 @@ class DeviceRegistry:
         dev=self._devices.get(pile_code)
         if dev:
             dev.transaction_id=transaction_id; dev.last_control={'frame_type':frame_type,'transaction_id':transaction_id,'time':time.time(),'raw_hex':raw_hex}; dev.touch(frame_type)
+            if frame_type==0x34: dev.charge_state='starting'
+            elif frame_type==0x36: dev.charge_state='stopping'
         if frame_type==0x34:
             self._transactions[transaction_id]={'transaction_id':transaction_id,'pile_code':pile_code,'gun_no':'01','status':'starting','started_at':time.time()}
         elif frame_type==0x36 and transaction_id in self._transactions:
@@ -78,13 +81,13 @@ class DeviceRegistry:
 
     def stop_reply(self,info:dict) -> None:
         dev=self._devices.get(info['pile_code'])
-        if dev: dev.charge_state='idle' if info['result']==1 else dev.charge_state; dev.touch(0x35)
+        if dev: dev.charge_state='stopping' if info['result']==1 else 'charging'; dev.touch(0x35)
         tx=self._transactions.setdefault(info['transaction_id'],dict(info)); tx.update(info); tx['status']='stopped' if info['result']==1 else 'stop_failed'; tx['updated_at']=time.time()
 
     def transaction_record(self,info:dict) -> None:
         tx=self._transactions.setdefault(info['transaction_id'],dict(info)); tx.update(info); tx['status']='completed'; tx['completed_at']=time.time()
         dev=self._devices.get(info['pile_code'])
-        if dev: dev.charge_state='idle'; dev.touch(0x3B)
+        if dev: dev.charge_state='idle'; dev.transaction_id=''; dev.touch(0x3B)
 
     def transactions(self) -> list: return sorted(self._transactions.values(),key=lambda x:x.get('started_at',x.get('updated_at',0)),reverse=True)
 
