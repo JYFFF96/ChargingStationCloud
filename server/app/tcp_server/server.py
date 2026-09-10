@@ -10,6 +10,7 @@ from app.protocol.ykc import (
     build_heartbeat_ack,
     parse_tariff_verify_body,
     build_tariff_verify_ack,
+    parse_realtime_body,
 )
 from app.services.device_registry import registry
 
@@ -82,8 +83,16 @@ class YKCTCPServer:
         if frame.frame_type == 0x05:
             info = parse_tariff_verify_body(frame.body)
             registry.touch(info['pile_code'], 0x05)
-            log.info('TARIFF VERIFY pile=%s model=%s -> compatible/no billing', info['pile_code'], info['model_code'])
+            log.info('TARIFF VERIFY pile=%s model=%s', info['pile_code'], info['model_code'])
             return build_tariff_verify_ack(frame.seq, frame.body, True)
+
+        if frame.frame_type == 0x13:
+            info = parse_realtime_body(frame.body)
+            registry.update_realtime(info)
+            log.info('REALTIME pile=%s gun=%s status=%s V=%.1f I=%.1f SOC=%s%% energy=%.4fkWh amount=%.4f faults=%s',
+                     info['pile_code'], info['gun_no'], info['work_status'], info['voltage_v'], info['current_a'],
+                     info['soc_pct'], info['energy_kwh'], info['amount_yuan'], info['faults'])
+            return None
 
         log.info('UNHANDLED frame type=0x%02X seq=%s', frame.frame_type, frame.seq)
         return None
