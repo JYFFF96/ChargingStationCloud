@@ -52,32 +52,19 @@ async def recv_frame(reader: asyncio.StreamReader):
 def realtime_body(pile: bytes, sample: int) -> bytes:
     # 云快充 V1.6 7.2 / 0x13，BIN 多字节字段低位在前。
     soc = min(95, 46 + sample)
-    voltage = 3990 + (sample % 10) * 2          # 399.0 ~ 400.8 V
-    current = 999 + (sample % 8) * 5           # 99.9 ~ 103.4 A
+    voltage = 3990 + (sample % 10) * 2
+    current = 999 + (sample % 8) * 5
     elapsed = 35 + sample
     remaining = max(0, 60 - elapsed)
-    energy = 234567 + sample * 1250             # 23.4567 kWh +
-    amount = 303838 + sample * 1600             # 30.3838 yuan +
+    energy = 234567 + sample * 1250
+    amount = 303838 + sample * 1600
     transaction = bcd('320102000000010126091022300001', 16)
     return b''.join([
-        transaction,
-        pile,
-        bcd('01', 1),
-        b'\x03',                                # charging
-        b'\x00',                                # gun not returned
-        b'\x01',                                # plugged
-        voltage.to_bytes(2, 'little'),
-        current.to_bytes(2, 'little'),
-        bytes([90]),                             # 40 C with -50 offset
-        b'\x00' * 8,
-        bytes([soc]),
-        bytes([85]),                             # battery max temp 35 C
-        elapsed.to_bytes(2, 'little'),
-        remaining.to_bytes(2, 'little'),
-        energy.to_bytes(4, 'little'),
-        energy.to_bytes(4, 'little'),            # loss energy, demo same as energy
-        amount.to_bytes(4, 'little'),
-        b'\x00\x00',                           # no hardware fault
+        transaction, pile, bcd('01', 1), b'\x03', b'\x00', b'\x01',
+        voltage.to_bytes(2, 'little'), current.to_bytes(2, 'little'), bytes([90]),
+        b'\x00' * 8, bytes([soc]), bytes([85]), elapsed.to_bytes(2, 'little'),
+        remaining.to_bytes(2, 'little'), energy.to_bytes(4, 'little'),
+        energy.to_bytes(4, 'little'), amount.to_bytes(4, 'little'), b'\x00\x00'
     ])
 
 
@@ -99,20 +86,21 @@ async def main():
 
     seq = itertools.count(1)
     sample = 0
+    tick = 0
     try:
         while True:
-            hb_seq = next(seq) & 0xFFFF
-            hb = frame(hb_seq, 0x03, pile + bcd('01', 1) + b'\x00')
-            print('TX HEARTBEAT', hb.hex(' ').upper())
-            writer.write(hb); await writer.drain()
-            print('RX HEART ACK', (await recv_frame(reader)).hex(' ').upper())
-
-            rt_seq = next(seq) & 0xFFFF
-            rt = frame(rt_seq, 0x13, realtime_body(pile, sample))
-            print('TX REALTIME ', rt.hex(' ').upper())
-            writer.write(rt); await writer.drain()
-            sample += 1
-            await asyncio.sleep(15)
+            if tick % 2 == 0:  # 10 秒心跳
+                hb = frame(next(seq) & 0xFFFF, 0x03, pile + bcd('01', 1) + b'\x00')
+                print('TX HEARTBEAT', hb.hex(' ').upper())
+                writer.write(hb); await writer.drain()
+                print('RX HEART ACK', (await recv_frame(reader)).hex(' ').upper())
+            if tick % 3 == 0:  # 充电中 15 秒实时数据
+                rt = frame(next(seq) & 0xFFFF, 0x13, realtime_body(pile, sample))
+                print('TX REALTIME ', rt.hex(' ').upper())
+                writer.write(rt); await writer.drain()
+                sample += 1
+            tick += 1
+            await asyncio.sleep(5)
     finally:
         writer.close()
         await writer.wait_closed()
