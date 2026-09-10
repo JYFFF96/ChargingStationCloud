@@ -3,7 +3,8 @@
     "pages/index/index",
     "pages/scan/scan",
     "pages/charging/charging",
-    "pages/profile/profile"
+    "pages/profile/profile",
+    "pages/records/records"
   ],
   "window": {
     "navigationBarTitleText": "云快充实训台",
