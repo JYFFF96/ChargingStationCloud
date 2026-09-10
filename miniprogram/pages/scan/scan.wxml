@@ -1,0 +1,1 @@
+<view class="scan-page"><view class="scan-box"><view class="scan-line"></view></view><view class="scan-title">扫描充电桩二维码</view><view class="scan-desc">请将充电桩上的二维码放入框内，识别后进入充电流程。</view><button class="scan-btn" bindtap="scan">开始扫码</button><view wx:if="{{result}}" class="result">扫码结果：{{result}}</view></view>
