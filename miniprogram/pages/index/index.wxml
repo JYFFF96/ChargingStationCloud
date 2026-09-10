@@ -1,0 +1,38 @@
+<view class="container">
+  <view class="header">
+    <view class="title">充电桩设备</view>
+    <button size="mini" bindtap="loadDevices" loading="{{loading}}">刷新</button>
+  </view>
+
+  <view wx:if="{{error}}" class="error">{{error}}</view>
+  <view wx:elif="{{!loading && devices.length === 0}}" class="empty">暂无在线设备，请先启动模拟桩或真实充电桩。</view>
+
+  <block wx:for="{{devices}}" wx:key="pile_code">
+    <view class="card">
+      <view class="row">
+        <text class="label">桩编号</text>
+        <text class="value">{{item.pile_code}}</text>
+      </view>
+      <view class="row">
+        <text class="label">状态</text>
+        <text class="value {{item.online ? 'online' : 'offline'}}">{{item.online ? '在线' : '离线'}}</text>
+      </view>
+      <view class="row">
+        <text class="label">类型</text>
+        <text class="value">{{item.pile_type === 0 ? '直流桩' : '交流桩'}}</text>
+      </view>
+      <view class="row">
+        <text class="label">枪数量</text>
+        <text class="value">{{item.gun_count}}</text>
+      </view>
+      <view class="row">
+        <text class="label">协议版本</text>
+        <text class="value">v{{item.protocol_version}}</text>
+      </view>
+      <view class="row">
+        <text class="label">最后报文</text>
+        <text class="value">0x{{item.last_frame_type}}</text>
+      </view>
+    </view>
+  </block>
+</view>
