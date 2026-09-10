@@ -1,38 +1,31 @@
-<view class="container">
-  <view class="header">
-    <view class="title">充电桩设备</view>
-    <button size="mini" bindtap="loadDevices" loading="{{loading}}">刷新</button>
+<view class="page-wrap">
+  <view class="hero">
+    <view class="hero-title">云快充实训台</view>
+    <view class="hero-sub">交直流充电教学与设备管理</view>
+    <view class="overview">
+      <view><text>{{devices.length}}</text><span>设备总数</span></view>
+      <view><text>{{onlineCount}}</text><span>在线</span></view>
+      <view><text>{{chargingCount}}</text><span>充电中</span></view>
+      <view><text>{{faultCount}}</text><span>故障</span></view>
+    </view>
   </view>
 
-  <view wx:if="{{error}}" class="error">{{error}}</view>
-  <view wx:elif="{{!loading && devices.length === 0}}" class="empty">暂无在线设备，请先启动模拟桩或真实充电桩。</view>
+  <view class="quick-card">
+    <view class="quick" bindtap="goScan"><view class="qicon">▣</view><text>扫码充电</text></view>
+    <view class="quick" bindtap="goCharging"><view class="qicon">⚡</view><text>充电监控</text></view>
+    <view class="quick"><view class="qicon">¥</view><text>支付计费</text></view>
+    <view class="quick"><view class="qicon">▤</view><text>充电记录</text></view>
+  </view>
+
+  <view class="section-head"><text>充电桩设备</text><text class="refresh" bindtap="loadDevices">刷新</text></view>
+  <view wx:if="{{error}}" class="notice error">{{error}}</view>
+  <view wx:elif="{{!loading && devices.length===0}}" class="notice">暂无设备，请先启动模拟桩或真实充电桩。</view>
 
   <block wx:for="{{devices}}" wx:key="pile_code">
-    <view class="card">
-      <view class="row">
-        <text class="label">桩编号</text>
-        <text class="value">{{item.pile_code}}</text>
-      </view>
-      <view class="row">
-        <text class="label">状态</text>
-        <text class="value {{item.online ? 'online' : 'offline'}}">{{item.online ? '在线' : '离线'}}</text>
-      </view>
-      <view class="row">
-        <text class="label">类型</text>
-        <text class="value">{{item.pile_type === 0 ? '直流桩' : '交流桩'}}</text>
-      </view>
-      <view class="row">
-        <text class="label">枪数量</text>
-        <text class="value">{{item.gun_count}}</text>
-      </view>
-      <view class="row">
-        <text class="label">协议版本</text>
-        <text class="value">v{{item.protocol_version}}</text>
-      </view>
-      <view class="row">
-        <text class="label">最后报文</text>
-        <text class="value">0x{{item.last_frame_type}}</text>
-      </view>
+    <view class="station-card">
+      <view class="station-top"><view><view class="station-name">充电桩 {{index+1}}</view><view class="station-id">{{item.pile_code}}</view></view><view class="status {{item.online?'online':'offline'}}">{{item.online?'在线':'离线'}}</view></view>
+      <view class="station-info"><text>{{item.pile_type===0?'直流桩':'交流桩'}}</text><text>{{item.gun_count}} 枪</text><text>协议 v{{item.protocol_version}}</text></view>
+      <view class="gun-row"><view class="gun-dot">1号枪</view><text class="muted">最后报文 0x{{item.last_frame_type}}</text></view>
     </view>
   </block>
 </view>
