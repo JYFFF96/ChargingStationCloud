@@ -83,7 +83,8 @@ def extract_frames(buffer: bytearray) -> Tuple[List[bytes], bytearray]:
 
 
 def parse_login_body(body: bytes) -> dict:
-    if len(body) < 31:
+    # 云快充 V1.6 6.1：7+1+1+1+8+1+10+1 = 30 bytes
+    if len(body) < 30:
         raise ValueError('login body too short')
     return {
         'pile_code': bcd_decode(body[0:7]),
@@ -93,7 +94,7 @@ def parse_login_body(body: bytes) -> dict:
         'program_version': body[10:18].rstrip(b'\x00').decode('ascii', errors='replace'),
         'network_type': body[18],
         'sim': bcd_decode(body[19:29]),
-        'operator': body[29] if len(body) > 29 else 0,
+        'operator': body[29],
     }
 
 
