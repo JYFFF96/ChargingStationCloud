@@ -1,22 +1,11 @@
 const api = require('../../utils/api')
 
 Page({
-  data:{
-    pileCode:'',charging:false,soc:0,voltage:'0.0',current:'0.0',power:'0.0',energy:'0.0000',amount:'0.0000',minutes:0,remaining:0,temp:0,statusText:'等待实时数据',faultText:'无',error:''
-  },
-  onShow(){this.refresh();this.startTimer()},
-  onHide(){this.stopTimer()},
-  onUnload(){this.stopTimer()},
+  data:{pileCode:'',gunNo:'01',transactionId:'',charging:false,soc:0,voltage:'0.0',current:'0.0',power:'0.0',energy:'0.0000',amount:'0.0000',minutes:0,remaining:0,temp:0,statusText:'等待实时数据',faultText:'无故障',rate:'--',serviceFee:'--',error:'',busy:false},
+  onShow(){const target=wx.getStorageSync('chargeTarget');if(target&&target.pileCode)this.setData({pileCode:target.pileCode,gunNo:target.gunNo||'01'});this.refresh();this.startTimer()},
+  onHide(){this.stopTimer()},onUnload(){this.stopTimer()},
   startTimer(){this.stopTimer();this.timer=setInterval(()=>this.refresh(),3000)},
   stopTimer(){if(this.timer){clearInterval(this.timer);this.timer=null}},
-  async refresh(){
-    try{
-      const devices=await api.getDevices();const list=(devices.items||[]).filter(x=>x.online);if(!list.length)throw new Error('暂无在线充电桩');
-      const pile=this.data.pileCode&&list.find(x=>x.pile_code===this.data.pileCode)?this.data.pileCode:list[0].pile_code;
-      const d=await api.getRealtime(pile);const power=((d.voltage_v||0)*(d.current_a||0)/1000).toFixed(1);
-      const statusMap={0:'离线',1:'故障',2:'空闲',3:'充电中'};
-      this.setData({pileCode:pile,charging:d.work_status===3,soc:d.soc_pct||0,voltage:Number(d.voltage_v||0).toFixed(1),current:Number(d.current_a||0).toFixed(1),power,energy:Number(d.energy_kwh||0).toFixed(4),amount:Number(d.amount_yuan||0).toFixed(4),minutes:d.elapsed_min||0,remaining:d.remaining_min||0,temp:d.gun_temp_c||0,statusText:statusMap[d.work_status]||'未知',faultText:(d.faults||[]).length?`Bit ${d.faults.join(', ')}`:'无故障',error:''})
-    }catch(err){this.setData({error:err.message||err.errMsg||'实时数据获取失败'})}
-  },
-  toggle(){wx.showToast({title:'远程启停接口将在下一版接入',icon:'none'})}
+  async refresh(){try{const r=await api.getDevices();const list=(r.items||[]).filter(x=>x.online);if(!list.length)throw new Error('暂无在线充电桩');let pile=this.data.pileCode;if(!pile||!list.find(x=>x.pile_code===pile))pile=list[0].pile_code;const dev=list.find(x=>x.pile_code===pile);let patch={pileCode:pile,transactionId:dev.transaction_id||this.data.transactionId,error:''};try{const d=await api.getRealtime(pile);const map={0:'离线',1:'故障',2:'空闲',3:'充电中'};Object.assign(patch,{charging:d.work_status===3,soc:d.soc_pct||0,voltage:Number(d.voltage_v||0).toFixed(1),current:Number(d.current_a||0).toFixed(1),power:((d.voltage_v||0)*(d.current_a||0)/1000).toFixed(1),energy:Number(d.energy_kwh||0).toFixed(4),amount:Number(d.amount_yuan||0).toFixed(4),minutes:d.elapsed_min||0,remaining:d.remaining_min||0,temp:d.gun_temp_c||0,statusText:map[d.work_status]||'未知',faultText:(d.faults||[]).length?`Bit ${d.faults.join(', ')}`:'无故障'});}catch(e){patch.charging=dev.charge_state==='charging';patch.statusText=patch.charging?'启动中/充电中':'等待实时数据'}this.setData(patch)}catch(e){this.setData({error:e.message||'数据获取失败'})}},
+  async toggle(){if(this.data.busy)return;this.setData({busy:true,error:''});try{if(this.data.charging||this.data.transactionId){const d=await api.stopCharge({pile_code:this.data.pileCode,gun_no:this.data.gunNo,transaction_id:this.data.transactionId||undefined});this.setData({transactionId:d.transaction_id,statusText:'停止命令已下发'});wx.showToast({title:'已下发0x36',icon:'none'})}else{const d=await api.startCharge({pile_code:this.data.pileCode,gun_no:this.data.gunNo,logical_card:'0000000000000000',physical_card:'0000000000000000',balance_yuan:1000});this.setData({transactionId:d.transaction_id,statusText:'启动命令已下发'});wx.showToast({title:'已下发0x34',icon:'none'})}setTimeout(()=>this.refresh(),800)}catch(e){this.setData({error:e.message||'操作失败'});wx.showToast({title:e.message||'操作失败',icon:'none'})}finally{this.setData({busy:false})}}
 })
