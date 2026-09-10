@@ -1,12 +1,28 @@
 {
   "pages": [
-    "pages/index/index"
+    "pages/index/index",
+    "pages/scan/scan",
+    "pages/charging/charging",
+    "pages/profile/profile"
   ],
   "window": {
-    "navigationBarTitleText": "充电桩云平台",
-    "navigationBarBackgroundColor": "#ffffff",
-    "navigationBarTextStyle": "black",
+    "navigationBarTitleText": "云快充实训台",
+    "navigationBarBackgroundColor": "#00BFA5",
+    "navigationBarTextStyle": "white",
+    "backgroundColor": "#f5f7fa",
     "backgroundTextStyle": "light"
+  },
+  "tabBar": {
+    "color": "#999999",
+    "selectedColor": "#00BFA5",
+    "backgroundColor": "#ffffff",
+    "borderStyle": "white",
+    "list": [
+      {"pagePath": "pages/index/index", "text": "首页"},
+      {"pagePath": "pages/scan/scan", "text": "扫码"},
+      {"pagePath": "pages/charging/charging", "text": "充电"},
+      {"pagePath": "pages/profile/profile", "text": "我的"}
+    ]
   },
   "style": "v2",
   "sitemapLocation": "sitemap.json"
