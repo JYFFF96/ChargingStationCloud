@@ -20,7 +20,12 @@ function getDevices() {
   return request('/api/devices')
 }
 
+function getRealtime(pileCode) {
+  return request(`/api/devices/${pileCode}/realtime`)
+}
+
 module.exports = {
   request,
-  getDevices
+  getDevices,
+  getRealtime
 }
