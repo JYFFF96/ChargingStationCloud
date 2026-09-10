@@ -1,5 +1,6 @@
 import argparse
 import asyncio
+import itertools
 
 START_FLAG = 0x68
 
@@ -48,6 +49,38 @@ async def recv_frame(reader: asyncio.StreamReader):
         buf.extend(data)
 
 
+def realtime_body(pile: bytes, sample: int) -> bytes:
+    # 云快充 V1.6 7.2 / 0x13，BIN 多字节字段低位在前。
+    soc = min(95, 46 + sample)
+    voltage = 3990 + (sample % 10) * 2          # 399.0 ~ 400.8 V
+    current = 999 + (sample % 8) * 5           # 99.9 ~ 103.4 A
+    elapsed = 35 + sample
+    remaining = max(0, 60 - elapsed)
+    energy = 234567 + sample * 1250             # 23.4567 kWh +
+    amount = 303838 + sample * 1600             # 30.3838 yuan +
+    transaction = bcd('320102000000010126091022300001', 16)
+    return b''.join([
+        transaction,
+        pile,
+        bcd('01', 1),
+        b'\x03',                                # charging
+        b'\x00',                                # gun not returned
+        b'\x01',                                # plugged
+        voltage.to_bytes(2, 'little'),
+        current.to_bytes(2, 'little'),
+        bytes([90]),                             # 40 C with -50 offset
+        b'\x00' * 8,
+        bytes([soc]),
+        bytes([85]),                             # battery max temp 35 C
+        elapsed.to_bytes(2, 'little'),
+        remaining.to_bytes(2, 'little'),
+        energy.to_bytes(4, 'little'),
+        energy.to_bytes(4, 'little'),            # loss energy, demo same as energy
+        amount.to_bytes(4, 'little'),
+        b'\x00\x00',                           # no hardware fault
+    ])
+
+
 async def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('--host', default='127.0.0.1')
@@ -58,22 +91,28 @@ async def main():
 
     reader, writer = await asyncio.open_connection(args.host, args.port)
     pile = bcd(args.pile, 7)
-
-    login_body = pile + bytes([args.type, 1, 0x10]) + b'V0.1.0\x00\x00' + b'\x01' + bcd('0', 10) + b'\x04'
+    login_body = pile + bytes([args.type, 1, 0x10]) + b'V0.3.0\x00\x00' + b'\x01' + bcd('0', 10) + b'\x04'
     tx = frame(0, 0x01, login_body)
     print('TX LOGIN    ', tx.hex(' ').upper())
     writer.write(tx); await writer.drain()
     print('RX LOGIN ACK', (await recv_frame(reader)).hex(' ').upper())
 
-    seq = 1
+    seq = itertools.count(1)
+    sample = 0
     try:
         while True:
-            hb = frame(seq, 0x03, pile + bcd('01', 1) + b'\x00')
+            hb_seq = next(seq) & 0xFFFF
+            hb = frame(hb_seq, 0x03, pile + bcd('01', 1) + b'\x00')
             print('TX HEARTBEAT', hb.hex(' ').upper())
             writer.write(hb); await writer.drain()
             print('RX HEART ACK', (await recv_frame(reader)).hex(' ').upper())
-            seq = (seq + 1) & 0xFFFF
-            await asyncio.sleep(10)
+
+            rt_seq = next(seq) & 0xFFFF
+            rt = frame(rt_seq, 0x13, realtime_body(pile, sample))
+            print('TX REALTIME ', rt.hex(' ').upper())
+            writer.write(rt); await writer.drain()
+            sample += 1
+            await asyncio.sleep(15)
     finally:
         writer.close()
         await writer.wait_closed()
