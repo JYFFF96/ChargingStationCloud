@@ -55,13 +55,7 @@ def parse_frame(raw: bytes, verify_crc: bool = True) -> Frame:
     calc_crc = crc16_modbus(payload)
     if verify_crc and recv_crc != calc_crc:
         raise ValueError(f'crc mismatch recv=0x{recv_crc:04X} calc=0x{calc_crc:04X}')
-    return Frame(
-        seq=int.from_bytes(payload[0:2], 'little'),
-        encrypted=payload[2],
-        frame_type=payload[3],
-        body=payload[4:],
-        raw=raw,
-    )
+    return Frame(seq=int.from_bytes(payload[0:2], 'little'), encrypted=payload[2], frame_type=payload[3], body=payload[4:], raw=raw)
 
 
 def extract_frames(buffer: bytearray) -> Tuple[List[bytes], bytearray]:
@@ -83,19 +77,9 @@ def extract_frames(buffer: bytearray) -> Tuple[List[bytes], bytearray]:
 
 
 def parse_login_body(body: bytes) -> dict:
-    # 云快充 V1.6 6.1：7+1+1+1+8+1+10+1 = 30 bytes
     if len(body) < 30:
         raise ValueError('login body too short')
-    return {
-        'pile_code': bcd_decode(body[0:7]),
-        'pile_type': body[7],
-        'gun_count': body[8],
-        'protocol_version': body[9] / 10.0,
-        'program_version': body[10:18].rstrip(b'\x00').decode('ascii', errors='replace'),
-        'network_type': body[18],
-        'sim': bcd_decode(body[19:29]),
-        'operator': body[29],
-    }
+    return {'pile_code': bcd_decode(body[0:7]), 'pile_type': body[7], 'gun_count': body[8], 'protocol_version': body[9] / 10.0, 'program_version': body[10:18].rstrip(b'\x00').decode('ascii', errors='replace'), 'network_type': body[18], 'sim': bcd_decode(body[19:29]), 'operator': body[29]}
 
 
 def build_login_ack(seq: int, pile_code_bcd: bytes, ok: bool = True) -> bytes:
@@ -105,11 +89,7 @@ def build_login_ack(seq: int, pile_code_bcd: bytes, ok: bool = True) -> bytes:
 def parse_heartbeat_body(body: bytes) -> dict:
     if len(body) < 9:
         raise ValueError('heartbeat body too short')
-    return {
-        'pile_code': bcd_decode(body[0:7]),
-        'gun_no': bcd_decode(body[7:8]),
-        'gun_status': body[8],
-    }
+    return {'pile_code': bcd_decode(body[0:7]), 'gun_no': bcd_decode(body[7:8]), 'gun_status': body[8]}
 
 
 def build_heartbeat_ack(seq: int, body: bytes) -> bytes:
@@ -128,3 +108,33 @@ def build_tariff_verify_ack(seq: int, body: bytes, consistent: bool = True) -> b
     if len(body) < 9:
         raise ValueError('tariff verify body too short')
     return build_frame(seq, 0x06, body[:9] + bytes([0x00 if consistent else 0x01]))
+
+
+def parse_realtime_body(body: bytes) -> dict:
+    """云快充 V1.6 7.2 / 0x13，消息体固定 60B，BIN 多字节低位在前。"""
+    if len(body) < 60:
+        raise ValueError(f'realtime body too short: {len(body)}')
+    u16 = lambda p: int.from_bytes(body[p:p + 2], 'little')
+    u32 = lambda p: int.from_bytes(body[p:p + 4], 'little')
+    fault_bits = u16(58)
+    return {
+        'transaction_id': bcd_decode(body[0:16]),
+        'pile_code': bcd_decode(body[16:23]),
+        'gun_no': bcd_decode(body[23:24]),
+        'work_status': body[24],
+        'gun_returned': body[25],
+        'gun_plugged': body[26],
+        'voltage_v': u16(27) / 10.0,
+        'current_a': u16(29) / 10.0,
+        'gun_temp_c': body[31] - 50,
+        'gun_code': body[32:40].hex().upper(),
+        'soc_pct': body[40],
+        'battery_max_temp_c': body[41] - 50,
+        'elapsed_min': u16(42),
+        'remaining_min': u16(44),
+        'energy_kwh': u32(46) / 10000.0,
+        'loss_energy_kwh': u32(50) / 10000.0,
+        'amount_yuan': u32(54) / 10000.0,
+        'fault_bits': fault_bits,
+        'faults': [bit + 1 for bit in range(13) if fault_bits & (1 << bit)],
+    }
