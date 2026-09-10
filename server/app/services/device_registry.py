@@ -1,5 +1,5 @@
 import time
-from dataclasses import asdict, dataclass
+from dataclasses import asdict, dataclass, field
 from typing import Dict, Optional
 
 
@@ -15,6 +15,7 @@ class DeviceState:
     network_type: int = -1
     last_seen: float = 0.0
     last_frame_type: int = 0
+    realtime: dict = field(default_factory=dict)
 
     def touch(self, frame_type: int = 0) -> None:
         self.online = True
@@ -46,6 +47,15 @@ class DeviceRegistry:
             dev.touch(frame_type)
         return dev
 
+    def update_realtime(self, info: dict) -> Optional[DeviceState]:
+        dev = self._devices.get(info['pile_code'])
+        if not dev:
+            return None
+        dev.realtime = dict(info)
+        dev.realtime['updated_at'] = time.time()
+        dev.touch(0x13)
+        return dev
+
     def mark_offline_by_peer(self, peer: str) -> None:
         for dev in self._devices.values():
             if dev.peer == peer:
@@ -54,6 +64,10 @@ class DeviceRegistry:
     def get(self, pile_code: str) -> Optional[dict]:
         dev = self._devices.get(pile_code)
         return asdict(dev) if dev else None
+
+    def realtime(self, pile_code: str) -> Optional[dict]:
+        dev = self._devices.get(pile_code)
+        return dict(dev.realtime) if dev and dev.realtime else None
 
     def all(self) -> list:
         now = time.time()
