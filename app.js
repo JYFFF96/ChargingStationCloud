@@ -1,0 +1,3 @@
+App({
+  globalData: { userInfo: null }
+})

@@ -1,0 +1,11 @@
+<view class="container">
+  <view class="hero card">
+    <view class="title">扫码充电</view>
+    <view class="muted">扫描充电桩二维码，确认设备后开始充电</view>
+    <button class="primary-btn" bindtap="scan">扫一扫充电</button>
+  </view>
+  <view class="card tips">
+    <view class="section-title">使用流程</view>
+    <view class="muted">扫码 → 确认设备 → 开始充电 → 查看实时状态 → 停止充电</view>
+  </view>
+</view>

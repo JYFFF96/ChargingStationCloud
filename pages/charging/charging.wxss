@@ -1,0 +1,4 @@
+.status { font-size:46rpx; font-weight:700; }
+.metrics { display:flex; justify-content:space-between; margin:48rpx 0; }
+.value { font-size:40rpx; font-weight:700; }
+.stop-btn { background:#fff; color:#d93025; border:1rpx solid #d93025; border-radius:999rpx; }

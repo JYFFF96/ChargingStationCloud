@@ -1,9 +1,0 @@
-{
-  "desc": "ChargingStationCloud sitemap",
-  "rules": [
-    {
-      "action": "allow",
-      "page": "*"
-    }
-  ]
-}

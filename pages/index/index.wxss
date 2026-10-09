@@ -1,0 +1,4 @@
+.hero { margin-top:40rpx; padding:64rpx 36rpx; }
+.title { font-size:54rpx; font-weight:700; margin-bottom:20rpx; }
+.tips { margin-top:28rpx; }
+.section-title { font-size:32rpx; font-weight:600; margin-bottom:16rpx; }

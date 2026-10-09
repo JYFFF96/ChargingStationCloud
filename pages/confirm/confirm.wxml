@@ -1,0 +1,9 @@
+<view class="container">
+  <view class="card">
+    <view class="title">确认充电设备</view>
+    <view class="row"><text>设备编号</text><text>{{device.deviceId}}</text></view>
+    <view class="row"><text>充电枪</text><text>{{device.gunId || '待后台确认'}}</text></view>
+    <view class="muted">当前二维码格式尚未最终确定，此页已预留解析和接口适配位置。</view>
+    <button class="primary-btn" disabled="{{!ready}}" bindtap="startCharge">开始充电</button>
+  </view>
+</view>

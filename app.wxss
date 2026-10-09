@@ -1,0 +1,5 @@
+page { background:#f5f7fa; color:#222; font-family:Arial, sans-serif; }
+.container { padding:32rpx; }
+.card { background:#fff; border-radius:24rpx; padding:32rpx; box-sizing:border-box; }
+.primary-btn { margin-top:32rpx; background:#07c160; color:#fff; border-radius:999rpx; }
+.muted { color:#8a8f99; font-size:26rpx; }

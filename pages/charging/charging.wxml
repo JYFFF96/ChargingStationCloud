@@ -1,0 +1,12 @@
+<view class="container">
+  <view class="card">
+    <view class="status">{{charging ? '充电中' : '已停止'}}</view>
+    <view class="muted">设备：{{deviceId}}</view>
+    <view class="metrics">
+      <view><text class="value">{{energy}}</text><text class="muted"> kWh</text></view>
+      <view><text class="value">{{amount}}</text><text class="muted"> 元</text></view>
+      <view><text class="value">{{seconds}}</text><text class="muted"> 秒</text></view>
+    </view>
+    <button wx:if="{{charging}}" class="stop-btn" bindtap="stopCharge">停止充电</button>
+  </view>
+</view>
