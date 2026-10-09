@@ -1,5 +1,9 @@
-page { background:#f5f7fa; color:#222; font-family:Arial, sans-serif; }
-.container { padding:32rpx; }
-.card { background:#fff; border-radius:24rpx; padding:32rpx; box-sizing:border-box; }
-.primary-btn { margin-top:32rpx; background:#07c160; color:#fff; border-radius:999rpx; }
-.muted { color:#8a8f99; font-size:26rpx; }
+page { background:#f4f7f6; color:#18211e; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif; }
+.container { padding:32rpx; box-sizing:border-box; }
+.card { background:#fff; border-radius:28rpx; padding:32rpx; box-sizing:border-box; box-shadow:0 10rpx 36rpx rgba(31,68,53,.06); }
+.primary-btn { height:96rpx; line-height:96rpx; margin-top:32rpx; background:#16a66a; color:#fff; border-radius:48rpx; font-size:32rpx; font-weight:600; }
+.primary-btn::after,.secondary-btn::after,.danger-btn::after { border:0; }
+.secondary-btn { height:88rpx; line-height:88rpx; margin-top:20rpx; background:#eaf7f1; color:#128456; border-radius:44rpx; font-size:30rpx; }
+.danger-btn { height:92rpx; line-height:92rpx; margin-top:32rpx; background:#fff1f0; color:#d84a42; border-radius:46rpx; font-size:30rpx; }
+.muted { color:#8a9290; font-size:26rpx; line-height:1.7; }
+.section-title { font-size:32rpx; font-weight:700; }

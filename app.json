@@ -3,19 +3,21 @@
     "pages/index/index",
     "pages/confirm/confirm",
     "pages/charging/charging",
+    "pages/result/result",
     "pages/records/records",
     "pages/profile/profile"
   ],
   "window": {
-    "navigationBarTitleText": "扫码充电",
+    "navigationBarTitleText": "智充",
     "navigationBarBackgroundColor": "#ffffff",
     "navigationBarTextStyle": "black",
-    "backgroundColor": "#f5f7fa"
+    "backgroundColor": "#f4f7f6"
   },
   "tabBar": {
-    "color": "#7a7e83",
-    "selectedColor": "#07c160",
+    "color": "#8a9290",
+    "selectedColor": "#16a66a",
     "backgroundColor": "#ffffff",
+    "borderStyle": "white",
     "list": [
       {"pagePath": "pages/index/index", "text": "充电"},
       {"pagePath": "pages/records/records", "text": "记录"},

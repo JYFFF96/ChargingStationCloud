@@ -1,0 +1,18 @@
+<view class="container">
+  <view class="done">
+    <view class="check">✓</view>
+    <view class="title">充电已结束</view>
+    <view class="muted">本次模拟充电已完成</view>
+  </view>
+  <view class="card">
+    <view class="fee">¥{{record.amount}}</view>
+    <view class="fee-label">本次费用</view>
+    <view class="row"><text>充电电量</text><text>{{record.energy}} kWh</text></view>
+    <view class="row"><text>充电时长</text><text>{{record.duration}}</text></view>
+    <view class="row"><text>充电设备</text><text>{{record.deviceId}}</text></view>
+    <view class="row"><text>充电枪</text><text>{{record.gunId}}号枪</text></view>
+    <view class="row"><text>结束时间</text><text>{{record.time}}</text></view>
+  </view>
+  <button class="primary-btn" bindtap="backHome">完成</button>
+  <button class="secondary-btn" bindtap="viewRecords">查看充电记录</button>
+</view>

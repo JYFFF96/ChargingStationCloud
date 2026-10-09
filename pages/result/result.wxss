@@ -1,0 +1,7 @@
+.done { text-align:center; padding:42rpx 0 32rpx; }
+.check { width:112rpx; height:112rpx; line-height:112rpx; margin:0 auto 20rpx; border-radius:50%; background:#16a66a; color:#fff; font-size:56rpx; font-weight:700; }
+.title { font-size:42rpx; font-weight:750; margin-bottom:8rpx; }
+.fee { text-align:center; font-size:70rpx; font-weight:800; }
+.fee-label { text-align:center; color:#8a9290; font-size:24rpx; margin-bottom:26rpx; }
+.row { display:flex; justify-content:space-between; padding:22rpx 0; border-top:1rpx solid #edf1ef; color:#69736f; font-size:26rpx; }
+.row text:last-child { color:#202925; }

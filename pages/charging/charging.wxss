@@ -1,4 +1,18 @@
-.status { font-size:46rpx; font-weight:700; }
-.metrics { display:flex; justify-content:space-between; margin:48rpx 0; }
-.value { font-size:40rpx; font-weight:700; }
-.stop-btn { background:#fff; color:#d93025; border:1rpx solid #d93025; border-radius:999rpx; }
+.charge-head { text-align:center; padding:28rpx 0 34rpx; }
+.pulse { width:126rpx; height:126rpx; margin:0 auto 18rpx; border-radius:50%; background:#dff6eb; display:flex; align-items:center; justify-content:center; }
+.inner { width:88rpx; height:88rpx; line-height:88rpx; border-radius:50%; background:#16a66a; color:#fff; font-size:42rpx; }
+.status { font-size:40rpx; font-weight:750; margin-bottom:8rpx; }
+.main-card { text-align:center; }
+.amount-label { color:#7d8783; font-size:25rpx; }
+.amount { font-size:76rpx; font-weight:800; margin:8rpx 0 28rpx; }
+.summary { display:flex; justify-content:center; align-items:center; border-top:1rpx solid #edf1ef; padding-top:28rpx; }
+.item { flex:1; display:flex; flex-direction:column; align-items:center; }
+.value { font-size:36rpx; font-weight:700; }
+.unit { color:#7d8783; font-size:22rpx; min-height:30rpx; }
+.name { color:#8a9290; font-size:23rpx; margin-top:6rpx; }
+.divider { width:1rpx; height:72rpx; background:#e7ece9; }
+.realtime { margin-top:26rpx; }
+.data-row { display:flex; justify-content:space-between; padding:23rpx 0; color:#7b8581; font-size:27rpx; border-bottom:1rpx solid #edf1ef; }
+.data-row:last-child { border-bottom:0; }
+.strong { color:#202925; font-weight:650; }
+.mock-tip { text-align:center; color:#a1a8a5; font-size:22rpx; padding:20rpx; }

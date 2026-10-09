@@ -1,11 +1,25 @@
 <view class="container">
-  <view class="hero card">
-    <view class="title">扫码充电</view>
-    <view class="muted">扫描充电桩二维码，确认设备后开始充电</view>
+  <view class="welcome">
+    <view class="brand">智充</view>
+    <view class="headline">即扫即充，简单一点</view>
+    <view class="sub">扫描充电桩二维码，确认设备后即可开始充电</view>
+  </view>
+  <view class="scan-card card">
+    <view class="scan-icon"><view class="qr">⌗</view></view>
+    <view class="scan-title">扫码充电</view>
+    <view class="muted">请确认车辆已连接充电枪</view>
     <button class="primary-btn" bindtap="scan">扫一扫充电</button>
+    <button class="secondary-btn" bindtap="mockScan">模拟扫码（开发测试）</button>
   </view>
-  <view class="card tips">
-    <view class="section-title">使用流程</view>
-    <view class="muted">扫码 → 确认设备 → 开始充电 → 查看实时状态 → 停止充电</view>
+  <view class="flow card">
+    <view class="section-title">充电流程</view>
+    <view class="steps">
+      <view class="step"><text class="num">1</text><text>扫描设备</text></view>
+      <view class="line"></view>
+      <view class="step"><text class="num">2</text><text>确认充电</text></view>
+      <view class="line"></view>
+      <view class="step"><text class="num">3</text><text>开始充电</text></view>
+    </view>
   </view>
+  <view class="notice">当前为开发测试版本，暂未连接真实充电设备</view>
 </view>

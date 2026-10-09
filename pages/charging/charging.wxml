@@ -1,12 +1,24 @@
 <view class="container">
-  <view class="card">
-    <view class="status">{{charging ? '充电中' : '已停止'}}</view>
-    <view class="muted">设备：{{deviceId}}</view>
-    <view class="metrics">
-      <view><text class="value">{{energy}}</text><text class="muted"> kWh</text></view>
-      <view><text class="value">{{amount}}</text><text class="muted"> 元</text></view>
-      <view><text class="value">{{seconds}}</text><text class="muted"> 秒</text></view>
-    </view>
-    <button wx:if="{{charging}}" class="stop-btn" bindtap="stopCharge">停止充电</button>
+  <view class="charge-head">
+    <view class="pulse"><view class="inner">⚡</view></view>
+    <view class="status">正在充电</view>
+    <view class="muted">{{deviceId}} · {{gunId}}号枪</view>
   </view>
+  <view class="main-card card">
+    <view class="amount-label">当前费用（元）</view>
+    <view class="amount">{{amount}}</view>
+    <view class="summary">
+      <view class="item"><text class="value">{{energy}}</text><text class="unit">kWh</text><text class="name">已充电量</text></view>
+      <view class="divider"></view>
+      <view class="item"><text class="value">{{duration}}</text><text class="unit"></text><text class="name">充电时长</text></view>
+    </view>
+  </view>
+  <view class="card realtime">
+    <view class="section-title">实时数据</view>
+    <view class="data-row"><text>充电功率</text><text class="strong">{{power}} kW</text></view>
+    <view class="data-row"><text>电压</text><text class="strong">{{voltage}} V</text></view>
+    <view class="data-row"><text>电流</text><text class="strong">{{current}} A</text></view>
+  </view>
+  <button class="danger-btn" bindtap="stopCharge">停止充电</button>
+  <view class="mock-tip">实时数据当前为模拟值，后续由后台接口提供</view>
 </view>

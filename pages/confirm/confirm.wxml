@@ -1,9 +1,16 @@
 <view class="container">
-  <view class="card">
-    <view class="title">确认充电设备</view>
-    <view class="row"><text>设备编号</text><text>{{device.deviceId}}</text></view>
-    <view class="row"><text>充电枪</text><text>{{device.gunId || '待后台确认'}}</text></view>
-    <view class="muted">当前二维码格式尚未最终确定，此页已预留解析和接口适配位置。</view>
-    <button class="primary-btn" disabled="{{!ready}}" bindtap="startCharge">开始充电</button>
+  <view class="status-card card">
+    <view class="online"><text class="dot"></text>设备可用</view>
+    <view class="device-name">充电桩 {{device.deviceId}}</view>
+    <view class="muted">请核对现场设备编号后开始充电</view>
   </view>
+  <view class="card detail">
+    <view class="section-title">充电信息</view>
+    <view class="row"><text class="label">设备编号</text><text>{{device.deviceId}}</text></view>
+    <view class="row"><text class="label">充电枪</text><text>{{device.gunId || '01（模拟）'}}</text></view>
+    <view class="row"><text class="label">电费</text><text>¥{{price}} / kWh</text></view>
+    <view class="row"><text class="label">服务费</text><text>¥{{serviceFee}} / kWh</text></view>
+  </view>
+  <view class="tip">请确认充电枪已正确连接车辆。当前价格和设备状态为模拟数据。</view>
+  <button class="primary-btn" loading="{{starting}}" disabled="{{!ready || starting}}" bindtap="startCharge">开始充电</button>
 </view>

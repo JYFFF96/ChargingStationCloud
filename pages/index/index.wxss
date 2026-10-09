@@ -1,4 +1,14 @@
-.hero { margin-top:40rpx; padding:64rpx 36rpx; }
-.title { font-size:54rpx; font-weight:700; margin-bottom:20rpx; }
-.tips { margin-top:28rpx; }
-.section-title { font-size:32rpx; font-weight:600; margin-bottom:16rpx; }
+.welcome { padding:38rpx 8rpx 36rpx; }
+.brand { color:#16a66a; font-size:28rpx; font-weight:700; margin-bottom:14rpx; }
+.headline { font-size:52rpx; line-height:1.25; font-weight:800; letter-spacing:-1rpx; }
+.sub { margin-top:16rpx; color:#7b8581; font-size:27rpx; }
+.scan-card { text-align:center; padding:48rpx 36rpx 36rpx; }
+.scan-icon { width:132rpx; height:132rpx; margin:0 auto 24rpx; border-radius:36rpx; background:#e9f8f1; display:flex; align-items:center; justify-content:center; }
+.qr { color:#16a66a; font-size:84rpx; line-height:1; transform:rotate(45deg); }
+.scan-title { font-size:38rpx; font-weight:750; margin-bottom:8rpx; }
+.flow { margin-top:28rpx; }
+.steps { display:flex; align-items:center; justify-content:space-between; margin-top:30rpx; }
+.step { display:flex; flex-direction:column; align-items:center; gap:12rpx; color:#56615d; font-size:24rpx; white-space:nowrap; }
+.num { width:52rpx; height:52rpx; line-height:52rpx; text-align:center; border-radius:50%; background:#e9f8f1; color:#15955f; font-weight:700; }
+.line { height:2rpx; background:#dce7e2; flex:1; margin:0 16rpx 34rpx; }
+.notice { text-align:center; color:#a1a8a5; font-size:23rpx; padding:30rpx 0 8rpx; }
